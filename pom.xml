@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.greenfieldmc</groupId>
-    <artifactId>greenfield-api</artifactId>
+    <groupId>com.frogocomics</groupId>
+    <artifactId>account</artifactId>
     <version>1.0.1-SNAPSHOT</version>
 
-    <name>Official Greenfield Server Api</name>
-    <description>The official Greenfield Server Api, used for creating plugins.</description>
+    <name>Lightweight Account Api</name>
+    <description>A lightweight account api used for creating player profiles</description>
     <url>www.greenfieldmc.com</url>
 
     <licenses>
