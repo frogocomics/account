@@ -2,6 +2,7 @@ package com.frogocomics.api.account;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import org.spongepowered.api.entity.player.Player;
 
 import java.util.HashMap;
@@ -49,6 +50,18 @@ public class AccountBuilder {
         }
 
         this.defaultAmount = amount;
+
+        return null;
+    }
+
+    public AccountBuilder setKey(String path, Object value) throws AccountException {
+
+        if(path.equalsIgnoreCase("player.money") || path.equalsIgnoreCase("player.uuid")) {
+            throw new AccountException("Please do not use the path \"player.money\" or \"player.uuid\"!");
+        }
+
+        settings.put(path.toLowerCase().trim(), value);
+
         return null;
     }
 
@@ -60,13 +73,17 @@ public class AccountBuilder {
         return defaultAmount;
     }
 
-    public Account build() {
+    public Account build() throws AccountException {
         if(!setMoney) {
             if(!setDefaultAmount) {
-                settings.put("player.money", 50000);
+                throw new AccountException("Please specify the amount of money or the default amount!");
             } else {
                 settings.put("player.money", getDefaultAmount());
             }
+        }
+
+        if(settings.get("player.uuid") == null) {
+            throw new AccountException("Please specify a player specific UUID!");
         }
 
         String accountJson = gson.toJson(settings);
