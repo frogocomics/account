@@ -1,12 +1,12 @@
 package com.frogocomics.api.account;
 
+import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 
-import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.spongepowered.api.entity.player.Player;
 
-import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Account {
@@ -25,7 +25,7 @@ public class Account {
      * @param player The player whose account is being made
      * @param accountJson The json String created for the account
      * @param playerUniqueId The UniqueId (UUID) of the player
-     * @param settings A {@link java.util.Map} of the player settings
+     * @param settings A {@link Map} of the player settings
      *
      * @see java.util.UUID
      */
@@ -43,16 +43,16 @@ public class Account {
         getLogger().info("\u2015\u2015\u2015\u2015");
     }
 
+    public Account() {}
+
     /**
-     * Gets an instance of {@link org.slf4j.Logger}.
+     * Gets an instance of {@link Logger}.
      *
-     * @return {@link org.slf4j.Logger}
+     * @return {@link Logger}
      */
     private Logger getLogger() {
         return logger;
     }
-
-    private RankBuilder builder;
 
     private String username;
     private String password;
@@ -60,7 +60,7 @@ public class Account {
     /**
      * Sets the specific Logger for the plugin.
      *
-     * @param logger An instance of {@link org.slf4j.Logger}
+     * @param logger An instance of {@link Logger}
      * @return null
      */
     public Account setLogger(Logger logger) {
@@ -75,33 +75,21 @@ public class Account {
      * @return An instance of {@link com.frogocomics.api.account.AccountExporter}
      */
     public AccountExporter getAccountExporter() {
-        return new AccountExporter(settings, accountJson, playerUniqueId, player);
+        try {
+            return new AccountExporter(settings, accountJson, playerUniqueId, player);
+        } catch(AccountException e) {
+            return null;
+        }
     }
 
     /**
-     * Write player information to a Ftp Server using JSON.
+     * Get the node manager.
      *
-     * @param ip The ip of the server
-     * @param port The port number of the server
-     * @return null
-     * @throws IOException If the program is unable to connect to a server
+     * @param node The node that will be worked on
+     * @return {@link Node}
      */
-    @Deprecated
-    public Account writeInformationToFtpServer(String ip, int port) throws IOException{
-        FTPClient ftpClient = new FTPClient();
-        ftpClient.connect(ip, port);
-        ftpClient.login(getUsername(), getPassword());
-        ftpClient.enterLocalPassiveMode();
-
-        FileWriter out = new FileWriter("\\accounts\\" + playerUniqueId + ".json");
-
-        char[] information = accountJson.toCharArray();
-        out.write(accountJson);
-
-        ftpClient.logout();
-        ftpClient.disconnect();
-
-        return null;
+    public Node getNodeManager(String node) {
+        return new Node(node, settings);
     }
 
     /**
@@ -109,6 +97,7 @@ public class Account {
      *
      * @param username Username of a Ftp Server
      * @return null
+     * @Deprecated FTP is not likely used
      */
     @Deprecated
     public Account setUsername(String username) {
@@ -163,10 +152,30 @@ public class Account {
      * Sends a value to be logged to the server console.
      *
      * @param value The value
-     * @param logger An instance of {@link org.slf4j.Logger}
-     * @param map A subclass of {@link java.util.Map} that uses {@link java.lang.String} and {@link java.lang.Object} for the value
+     * @param logger An instance of {@link Logger}
+     * @param map A subclass of {@link Map} that uses {@link String} and {@link Object} for the value
      */
+    @Beta
     private void sendValue(String value, Logger logger, Map<String, Object> map) {
         logger.info("Value \"" + value + "\":" + map.get(value));
+    }
+}
+
+class Node {
+
+    private String node;
+    private HashMap<String, Object> settings;
+
+    public Node(String node, Map<String, Object> settings){
+        this.node = node;
+        this.settings = (HashMap<String, Object>) settings;
+    }
+
+    public Object getValue() throws NodeNotFoundException {
+        if(settings.get(node) == null) {
+            throw new NodeNotFoundException();
+        } else {
+            return settings.get(node);
+        }
     }
 }

@@ -9,6 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * The AccountBuilder class hides the code used to create an
+ * player profile. It should not be accessed directly but rather
+ * through {@link Accounts#builder(Player)}.
+ *
+ * @see Accounts
+ */
 public class AccountBuilder {
 
     private Player player;
@@ -25,11 +32,24 @@ public class AccountBuilder {
         this.player = player;
     }
 
+    /**
+     * Set the Unique id (UUID) of the player
+     * in a {@link String}.
+     *
+     * @param uuid The Unique id (UUID) of a player
+     * @return null
+     */
     public AccountBuilder setUniqueId(UUID uuid) {
         settings.put("player.uuid", uuid);
         return null;
     }
 
+    /**
+     * Set the amount of money the player has.
+     *
+     * @param amount The amount of money that is to be given to the player
+     * @return null
+     */
     public AccountBuilder setMoney(long amount) {
         if(amount < 0) {
             settings.put("player.money", getDefaultAmount());
@@ -41,6 +61,14 @@ public class AccountBuilder {
         return null;
     }
 
+    /**
+     * If the amount of money the player should have is not set,
+     * Use this instead. This will set a default amount, which is
+     * to be used as a backup.
+     *
+     * @param amount The default amount that servers as a backup
+     * @return null
+     */
     public AccountBuilder setDefaultAmount(long amount) {
 
         setDefaultAmount = true;
@@ -73,6 +101,14 @@ public class AccountBuilder {
         return defaultAmount;
     }
 
+    /**
+     * Create the account, and cast it into a {@link Account},
+     * which could then be cast as a {@link AccountExporter}
+     * through the {@link Account#getAccountExporter()} method.
+     *
+     * @return An instance of {@link Account}
+     * @throws AccountException
+     */
     public Account build() throws AccountException {
         if(!setMoney) {
             if(!setDefaultAmount) {
